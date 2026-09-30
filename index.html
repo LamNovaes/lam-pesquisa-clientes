@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pesquisa de Satisfação – LAM Consultoria Contábil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#233D82; --navy-2:#1A2F66; --navy-soft:#E6EBF5;
+  --bg:#F2F4F9; --card:#FFFFFF; --ink:#1C2436; --muted:#5B6479; --line:#D8DDE8;
+  --det:#C8452F; --neu:#C99A1E; --pro:#2E8B57;
+  --focus:#4A6BD1;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --navy:#8FA8E8; --navy-2:#B3C4F0; --navy-soft:#1F2A47;
+    --bg:#10162A; --card:#18203A; --ink:#E7EBF5; --muted:#A3ADC4; --line:#2E3A5C;
+    --focus:#8FA8E8;
+  }
+}
+:root[data-theme="dark"]{
+  --navy:#8FA8E8; --navy-2:#B3C4F0; --navy-soft:#1F2A47;
+  --bg:#10162A; --card:#18203A; --ink:#E7EBF5; --muted:#A3ADC4; --line:#2E3A5C;
+  --focus:#8FA8E8;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:680px;margin:0 auto;padding:24px 18px 48px}
+
+/* Brand header */
+.brand{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}
+.logo-plate{background:#fff;border-radius:10px;padding:8px 12px;display:inline-flex;line-height:0}
+.logo-plate img{height:52px;width:auto;max-width:100%}
+.stepcount{font-size:14px;color:var(--muted);font-weight:600;white-space:nowrap}
+
+.progress{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin-bottom:22px}
+.progress span{display:block;height:100%;width:0;background:var(--navy);transition:width .35s ease}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 24px 24px}
+.panel h1{font-size:28px;line-height:1.2;margin:0 0 10px;font-weight:800;letter-spacing:-.01em;color:var(--navy)}
+.panel h2{font-size:23px;line-height:1.25;margin:0 0 6px;font-weight:800;letter-spacing:-.01em}
+.lead{color:var(--muted);margin:0 0 22px}
+.q{margin:0 0 26px}
+.q:last-child{margin-bottom:0}
+.q-label{display:block;font-weight:700;margin-bottom:10px;font-size:17px}
+.q-hint{font-size:14px;color:var(--muted);font-weight:500}
+.req{color:var(--det)}
+
+/* NPS scale — the signature element */
+.nps{display:grid;grid-template-columns:repeat(11,1fr);gap:6px}
+.nps button{appearance:none;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:700;font-size:17px;border-radius:10px;aspect-ratio:1/1.15;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.nps button:hover{border-color:var(--navy)}
+.nps button[aria-pressed="true"]{color:#fff;border-color:transparent}
+.nps button.det[aria-pressed="true"]{background:var(--det)}
+.nps button.neu[aria-pressed="true"]{background:var(--neu)}
+.nps button.pro[aria-pressed="true"]{background:var(--pro)}
+.nps-ends{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:8px}
+.nps-bands{display:grid;grid-template-columns:7fr 2fr 2fr;gap:6px;margin-top:6px}
+.nps-bands i{height:4px;border-radius:4px;display:block}
+@media (max-width:520px){
+  .nps{grid-template-columns:repeat(6,1fr)}
+  .nps-bands{display:none}
+}
+
+/* 1–5 rating */
+.rate{display:flex;gap:8px;flex-wrap:wrap}
+.rate button{appearance:none;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:700;min-width:48px;height:48px;border-radius:24px;cursor:pointer;padding:0 14px}
+.rate button:hover{border-color:var(--navy)}
+.rate button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:var(--card)}
+.rate-legend{font-size:13px;color:var(--muted);margin-top:6px}
+
+.skip{display:flex;align-items:center;gap:10px;background:var(--navy-soft);border-radius:12px;padding:12px 14px;margin-bottom:22px;cursor:pointer;font-weight:600}
+.skip input{width:20px;height:20px;accent-color:var(--navy);margin:0}
+.dept-body[hidden]{display:none}
+
+textarea,input[type=text],input[type=tel],input[type=email]{width:100%;font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px}
+textarea{min-height:96px;resize:vertical}
+textarea:focus,input:focus{outline:none;border-color:var(--navy)}
+
+.choices{display:grid;gap:8px}
+.choice{display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:600}
+.choice:has(input:checked){border-color:var(--navy);background:var(--navy-soft)}
+.choice input{width:20px;height:20px;accent-color:var(--navy);margin:0}
+.inline{grid-template-columns:1fr 1fr}
+
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:26px}
+.btn{appearance:none;font:inherit;font-weight:700;border-radius:12px;padding:14px 22px;cursor:pointer;border:1.5px solid transparent}
+.btn-primary{background:var(--navy);color:var(--card);margin-left:auto}
+.btn-primary:hover{background:var(--navy-2)}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn[hidden]{display:none}
+.btn:disabled{opacity:.6;cursor:wait}
+.err{color:var(--det);font-weight:600;font-size:15px;margin-top:10px;min-height:1px}
+
+button:focus-visible,.btn:focus-visible,.choice:focus-within,.skip:focus-within{outline:3px solid var(--focus);outline-offset:2px}
+
+.step{display:none}
+.step.on{display:block;animation:in .3s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.step.on{animation:none}.progress span{transition:none}}
+
+.dept-tag{display:inline-block;background:var(--navy-soft);color:var(--navy);font-weight:700;font-size:14px;padding:4px 10px;border-radius:20px;margin-bottom:10px}
+
+/* Thanks */
+.thanks-mark{width:64px;height:64px;border-radius:50%;background:var(--navy);display:grid;place-items:center;margin-bottom:16px}
+.thanks-mark svg{width:32px;height:32px}
+.summary{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px;font-size:14px;white-space:pre-wrap;max-height:280px;overflow:auto;margin:16px 0 12px}
+.copied{font-size:14px;color:var(--pro);font-weight:600;margin-left:10px}
+.foot{text-align:center;color:var(--muted);font-size:13px;margin-top:22px}
+</style>
+</head>
+<body>
+<!-- Formulário oculto para o Netlify Forms reconhecer os campos da pesquisa -->
+<form name="pesquisa-lam" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="pesquisa-lam">
+  <input type="hidden" name="bot-field">
+  <input type="hidden" name="subject">
+  <input type="hidden" name="Empresa">
+  <input type="hidden" name="Responsável pelo preenchimento">
+  <input type="hidden" name="Nota de indicação (0 a 10)">
+  <input type="hidden" name="Classificação NPS">
+  <input type="hidden" name="Motivo da nota">
+  <input type="hidden" name="Relacionamento com o Cliente - Utiliza o setor">
+  <input type="hidden" name="Relacionamento com o Cliente - Cordialidade e atenção no atendimento">
+  <input type="hidden" name="Relacionamento com o Cliente - Rapidez para responder dúvidas e solicitações">
+  <input type="hidden" name="Relacionamento com o Cliente - Facilidade de contato (telefone, WhatsApp, e-mail)">
+  <input type="hidden" name="Relacionamento com o Cliente - Melhorias">
+  <input type="hidden" name="Societário - Utiliza o setor">
+  <input type="hidden" name="Societário - Agilidade nos processos de alteração contratual e registros">
+  <input type="hidden" name="Societário - Clareza nas orientações sobre a documentação necessária">
+  <input type="hidden" name="Societário - Melhorias">
+  <input type="hidden" name="Financeiro - Utiliza o setor">
+  <input type="hidden" name="Financeiro - Clareza das cobranças e dos valores de honorários">
+  <input type="hidden" name="Financeiro - Pontualidade no envio de boletos">
+  <input type="hidden" name="Financeiro - Melhorias">
+  <input type="hidden" name="Fiscal - Utiliza o setor">
+  <input type="hidden" name="Fiscal - Envio das guias de impostos dentro do prazo">
+  <input type="hidden" name="Fiscal - Orientação sobre enquadramento tributário e economia de impostos">
+  <input type="hidden" name="Fiscal - Melhorias">
+  <input type="hidden" name="Contábil - Utiliza o setor">
+  <input type="hidden" name="Contábil - Qualidade e confiabilidade das informações contábeis">
+  <input type="hidden" name="Contábil - Clareza dos relatórios para apoiar suas decisões">
+  <input type="hidden" name="Contábil - Melhorias">
+  <input type="hidden" name="Departamento Pessoal - Utiliza o setor">
+  <input type="hidden" name="Departamento Pessoal - Precisão no cálculo da folha de pagamento e encargos ou pró-labore">
+  <input type="hidden" name="Departamento Pessoal - Agilidade em admissões, férias e rescisões">
+  <input type="hidden" name="Departamento Pessoal - Melhorias">
+  <input type="hidden" name="BPO Financeiro - Utiliza o setor">
+  <input type="hidden" name="BPO Financeiro - Organização e pontualidade nas contas a pagar e a receber">
+  <input type="hidden" name="BPO Financeiro - Precisão da conciliação bancária e dos relatórios financeiros">
+  <input type="hidden" name="BPO Financeiro - Melhorias">
+  <input type="hidden" name="BPO Departamento Pessoal - Utiliza o setor">
+  <input type="hidden" name="BPO Departamento Pessoal - Organização das rotinas de pessoal (ponto, benefícios e documentos)">
+  <input type="hidden" name="BPO Departamento Pessoal - Agilidade no atendimento às demandas dos colaboradores">
+  <input type="hidden" name="BPO Departamento Pessoal - Melhorias">
+  <input type="hidden" name="Tem reclamação">
+  <input type="hidden" name="Reclamação">
+  <input type="hidden" name="Sugestões de melhoria">
+  <input type="hidden" name="Novos serviços desejados">
+  <input type="hidden" name="Satisfação geral">
+  <input type="hidden" name="Autoriza contato">
+  <input type="hidden" name="Contato">
+  <textarea name="Resumo completo"></textarea>
+</form>
+<div class="wrap">
+  <header class="brand">
+    <span class="logo-plate"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAABkCAYAAACvgC0OAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAABERSURBVHhe7V3LkRw3EpUJ64EYZOx9z8thSDeRe1l6sAzOROgqD0Q2DaAJHd1rgEygCTJhTBgTtAFUZXXi4ZP4JJpds/kiXmhYBSSyUPkAVBaq9cMPBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaD4YJXd4evL998/mbU4OED9m8L/v7P3/8R29Szf004X2P/I/6B9bSQaCvLH3/6/QXWn41Xr7/8jH6UiPWb4Yy8enP4y6jBz5+wf1vgbn5sU8/+NfHq7vAY+5/g3eE91tVA1E6R1+/XV3efj7EfeWL9ZpjQNTkWMM9F6PJ1XDhrVsd2irw7PGL9mXAriMgHgWijGSZ0TY4JURbImP1roXW2+vGn3/+GNkaBbYictLJIwd3HqH2BaKMZJnRNjgnxOQjdifbV3eEp9j3Pl28+/4Z2RoFtSJy1skih+rGGEW00w4SuyTEhPgehuyRc7LfACUvnqI0KXiMp51YO2G4N0U4zTOiaHBPi8xB6Zzy9/vIz2hpBZL+K8/vXrRzidmWinWZ03xhjgmOBsneh9ySZNt59PqK9EUT2a3h3eEI7mhjpH7TVDBO6JseEuHehuz0Zsc+VvDs8aSblIvuVnLlXoScJR0RbzTCha3JMiM9A6M1JJk5NkaHtWqpsTslgpH/QVjNM6JocE+KehV6VZBKy8S/fHP5Eu71A2y2ckZTrSlIyor1mmNA1OSbEfQtdeHd+d3iqCXa3DRht9wDtNvHu8BXtjULUmTAIor1miA4YGzgmxL0K3b87j3wFruKRAlpLZJFdRh/zpWW0clJOTMLdHR4lHaLNZkgNGFs4JsS9Ct1teIl9DUkzdc3Mj/Z7ENlldDEv+ayaLxCSlPQBEB7nRJvNkBowtnBMiPsV+uHP2NcL+bO3EzyeR2qIDG2G9v0Xa8VViGq+oLSKWd82SDpEm82QGjC2cEyIexR6nXDDLa7ywDCe+UabKfvS6kIjXyDmJdb9A5IO0W4zpAaMLRwT4h6FLi1LHfH9uLRsXusMZb7RHicJXRykFDbxSPqiwUQqh3abITVgbOGYEHcq9PyydBFV9LGItGzWuNbYXuDTtmIori4GN/FISbjQj7IOQ8sdkBpQoX+1Ev9qxjUZ+TSFg8G5M6GLy1LHzOef0rJ59EOXyB6jiwcqJ13DSL5AukZuW4rR0HIHpAY0yDv2ewF9msMxIe5P6MIHGoUMeuUGm+QgUYPIFiOPR+mz2t6knGQX+0bSIS/bBakBDZrQ67AnoUvLUk/hnXjxXXZm2V8LtAV2g3gU8wwdX9ZJKwW8l5IOedkuSA1oEDv2ewB9msMxIe5J6DUJNSlrLQoskcirBdrhxHgUB62OpFzx2T+RbJR0yMt2QWpAg9ix3wPo0xyOCXFPQpdnY3nJKwpsiZ2uX59BO2AzikdJBy0DjpTNT61UpPaxfDOkBjSY6thrA32awzEh7kXosp/1AhXjrzMpF9kJfYviUcoZ1F6Pg5SES+UepH7A8s2QGtBgqmOvDfRpDseEKAtozL4WxEBumAHlZ9m+Z+TIBmMuHourlMoBpyIJl7Qj6RDLN0NqQIO5jr0m0Kc5HBPiHoQuBnJmaZpDjb2eZ+TIRuhfMh5d/2LZgBUDjjRw5VYGkg6xfDOkBjSY69hrAn2awzEh7kHoUiB7JpamJYgrhI6NK5ENxlw8ijmDigGnuCoorHQkHWL5ZkgNaDDXsdcE+jSHY0LcidCL2WR8P1wDKXnl2LpxBeuHtvLxKA06mC3nEO9fYaCQdIjlmyE1oMFSx14L6NMcjglRDJRB+6MQZzxH4d15DtJMWJPF58D6oa18PI7cA2mQKC39JR1i+WZIDWiw1LHXAvo0h/kgqMFIkF0DNe+9pXfnOWi8l+fAupxSPBYHnUwyTdq/Lw1Ukg6xfDOkBjQodew1gD7N4ZgQdyD0vAAc3Xl3DR2sfPavXi1EdRmleBR9SeQgpIFKevSQdIjlmyE1oEGpY68B9GkOx4R4y0KX3jNfhQ3P/1FdRikepTcBqbcKxUGwIpko6RDLN0NqQINSx14D6NMcjgnxloUufsByJUozIwHrhTbkeJSet3lSTrxvhSQcQdIhlm+G1IAGazp2NtCnORwTohgwg/Z7IT1/XpO1sYT1Wm3IicfLvWgZFHKQdIjlmyE1oMGajp0N9GkOx4R4q0KXnj+vzRrhYB3O2ngsamN9jJAGBJW2TOj1QJ/mcEyItyt04d351Sn3Q1znwtp4lJJyy/nybrraRw1Jh1i+GVIDGqzt2JlAn+ZQDsASblHoNZtZrs7MKy6OqA5jSzwKSTnp9+FFPwmSDrF8M6QGNNjSsbOAPs3hmBBvUejS86eju7+6rFhBJF5xcUTlwV8sn4M0Y5dZf7+cT3H9C7F8M6QGNNjSsbOAPs1h/Y1N4TaFnp/RHGfcW+n11tpu9IqLA8v3+iw9g5dYk0sgSDrE8s2QGtBgS8fOAvo0h2NCFIW+/q97ZhF3nknPqI61z6CtqFlJlN5NY9nQ57Z47Hm1KA1ECOcT2uDE8s2QGtBga8fOAPo0h5OFPpuwF1sM8IqNIL2oyQ3kPvl0wLJQrykeu+5LYV97CpIOsXwzpAY02NqxM4A+zeHzEXrVkrViI8gIxGf1QrIrKsvYE4/FpBuy4FcOkg6xfDOkBjTY07HaQJ/m8PkIvSYJhUt9bdQ8OuRmzqgcY088tuwlKK00cpB0iOWbITWgwZ6O1Qb6NIfPSOjSDNYxa7WiakdeZlURlWPsiceaBCGx53FG0iGWb4bUgAZ7OlYb6NMcPg+h1/jRM2v1QEzKZfIEUbnQ9654FH3x/qQHHgmSDrF8M6QGNNjbsZpAn+bwmQi9IqBT4pqBmj5JZf6xTFi+Lx5rEoS9jzOSDrF8M6QGNNjbsZpAn+bwuQhdWKJ2zlq9kB4jUj/qgGXC8v3xWEoQpvyohaRDLN8MqQENjnSsFtCnORwTusEwDSZ0TZrQDTcKE7omTeiGG4UJXZMmdMONwoSuSRO64UZhQtekCd1wozCha9KEbrhRmNA1aUI33ChM6JrUEfovvx5fvH04/fbu/nR893D6FvD+9OlfD8fk7qtfHs4f3Pm4zvmrO/fv/xyD3WyuHV/+/vTJtcfPcVA5ZyM659s8fwUfj778r8fghxd4e/w4IlWGru2X+/8GH7G4f1N5idyfSx+Hvr99OP2RasfXEdpy9vCafT3yPXGOsN07oW+6YULX5LjQ3308v3/7cH5693D+q0QMxLf35z+xDNKV4WL3gcvLfDwnf57pUu4U3MeaNrmfvD1uB5Eqswjx/BcKwYsj0W6K5IsbKGv62A0CPW3hgEi+4z0juHsS1M+UG4IJXZPjQqcAdDOLu+FIP+Os56mOnw38sfOT+xvruGObKJlQSHiXNs9POOvzclzoXLSpNim4Az8nCN3bDGfWI9XHGZdmVO6bG9wi35mg+Sy8Hb8/HaM6H8/vedu8HyWh0/1jfutvMTaha3JM6G6mSQU5B4nFCZeOkfhxJuHwgQj1LsJbl6w+yMJZDMvRMb/sBSFzpOrMEDqipg06nxrUCCRa/kjDhJ714d39+dGV4aKWhH4ZhN1jhOxbF0zomhwTekrEiFQgS4HkwJeHdIyLcXlmXWZ2tJMSLZ/deFlC6rk+5XsKqTJaQq/pY4eUqFPHEKl7kTpG8P3ExE2iLw3aXTCha1JH6FxQNSgFEgcKANvbZmkQAZZzoBWCm8FKSSYOSYSEVBltoUt9nBJ16hhiE2ql0GkWp5XR9hgmDETNMKFrct9Cdyg9y/NyfvZJJbT80tX54x8Hgky+JEJCqswtC931hbfLnu35+dL9oaU+JUJ5v+bernTBhK7J/Qud8gQ+sbfO1KlyVNbNREnBE9kzvyRCQqrMTQldIC67c/dny5s8nIP/HfSW1Ms8FnXBhK5JHaHjjZeQCyQEBSL9Oxf0l6TQcjxXLod1APCPAen20iIkpMrclNDZqiXkKnZ8LZe5P7kEaG8cFGFC16SO0HNBSsAyuUBCYL1c0PvEHWWP11dnWG55ljx9w9mLI99e2/Utx25J6Gkfcm2n7k/w7nzdYBRwPVfq3yZcQ+j/PxwTes3rNQcss4kgs+HFYbN9f95+vbUU9HxZuSXeWDkp6B3QT55hDktekCujJvSMfcS2qmkQukPKdkrofMVTZnxvumBC1+SY0B3YhpnkltRtcwUTLM/c5t6/svfCiQ0s6WBiS8slYcTK5TL0hJzg6Fhu9XERADxOKAndYXuNmJktl1eDYZLMQVXoLOnpjiMvg2u4aacbJnRNjgudL9vwWTBIerFEDX8HjvVwmyoPNknocWadLd1Zm8t/2bPqNjDEG2rCnWvF6wv6chN6gZtI1n/z+hxBH6/XlfIBBzEtofOVW25gdrgMtPn2qmFC1+S40B18QDGxcPpAvD9/xQChDDiWv/D0DZf2S8AtH73w4xz0LJ4q5/flZ/a7L36ejujn8vyfvz5/PBHY+PFJiu56tmvKDF4Et3Jo9b0uLxG3Tb7T67KtTxPXybEMWstHQniuGSZ0TeoI3WBQhwldkyZ0w43ChK5JE7rhRmFC16QJ3XCjMKFrcv9C94mi+/MjJqIMO4cJXZP7FroTOW2QwXOGncOErkkdobvXMHzzBD9HX0oR+cxL9VLl+Xkk2fCvpj6e3+Nsnivvz/16fLG9NmJ/S0CbZHe7vsQmEfI/KMfIy+I57nOqLq/P+yl1Pc43bM8fL7SZ6puSHbwHwzCha3Jc6Mt7WHy3u7yX5bulAq4z8FaXvZ91QeOO5W1fNnLQZhZ8T4zllzaWd+rLJpLVP/a3hMgebHjBzSq+Dvv1FioXceuL+BzZzNVd29h+5WUj7B/Y9ivAyieqx+qm+qZkJzUADMGErskxoVMA8pGfxO3/Xn/yiddZgmUV2rKp5dEtv/ETU14ndczNIOtmnEcUGQae32yyflk1IvRUMHMRYj9sW1eZ0Hld2pji/wb7y0aaxWaqLgE37NCW4+3f61555wveC2yT18W+abGjAhO6JnWEHhxbf5LJ/b0IGbaGcqGt55eZezmWtJk6tgYlneNLZwy89WeS/V77WUL3AxjbEUb/pnqpawj7IrTvBrJSXcIi9MsMzh99HGiQowGYL7GxTd4O9k2LHRWY0DWpL3SOWqFv+9DXXzhFm6lja10vLAx2VzZmLG4M5hJie4s/20Djf/F2+VVamv22//Klu99OS7+rvmxd3eyzzz/dKmWzx1YN6eu5HKctx5vfrG/W2fjy45HQJl8dYd9IdkzoN019offM6HSczxi8DrZDAnJ1/Ln705GW5g5LwJ9+I4HRF2b+3IDQU8HMfXNiWF73xTP1Raxsv/v96RPNjJHo1g9WsA2Et70myda+8MJ352j5T32xrDLYV4TY5vrRjj/HrqHGTqpvhmBC16SO0PmyOQj8BqE7+Fls/XCD18FAp2COyBJbPPCCGXai0OnDEydQShBSPbwGBNrn5Ut1+XU7BP3Pv7xjpFwCthnkV8J+StqhumhHBSZ0TY4J3WFdKvplnSMFujt3EeRlFluXq8kZn4KUgg2P078xAeXgZhlKErmyy4BBM+eS8FvqhkL3/gSzbPrLuMjm+nUX940ShLi60BJ64GcwWF76n66VfME3Ev4a2ONCrk3eT7hU98fADvYNL9uFl28OH1yAGhX4+svwKLzNkozBDM/+H13+HP/d9PVnnzZjrHxwjD0O0N+8DQe/vGSPAZx+ycmy+uSDD2z0PfNJJ5YjH7hvDt5/+PGHVDkElaN/p64Z6c75pF3BL3y/7a6ZRFtsc+2nWjtIXtZgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMAzhf8+bGrDlXoieAAAAAElFTkSuQmCC" alt="LAM Consultoria Contábil Empresarial"></span>
+    <span class="stepcount" id="stepcount" aria-live="polite"></span>
+  </header>
+  <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+
+  <main class="panel" id="form">
+
+    <!-- 0 Boas-vindas -->
+    <section class="step" data-step="intro">
+      <h1>Como está a nossa parceria?</h1>
+      <p class="lead">Queremos atender você e sua empresa cada vez melhor. São poucas perguntas, cerca de 3 minutos, e suas respostas são tratadas com sigilo.</p>
+      <p class="lead" style="margin-bottom:0">Você vai avaliar cada setor do escritório: Relacionamento com o Cliente, Societário, Financeiro, Fiscal, Contábil, Departamento Pessoal, BPO Financeiro e BPO Departamento Pessoal. Se não utiliza algum deles, é só marcar e seguir.</p>
+    </section>
+
+    <!-- 1 NPS -->
+    <section class="step" data-step="nps">
+      <h2>Você indicaria a LAM?</h2>
+      <p class="lead">Pense em um amigo, familiar ou parceiro de negócios.</p>
+      <div class="q">
+        <span class="q-label" id="nps-l">Em uma escala de 0 a 10, qual a probabilidade de você indicar a LAM Consultoria Contábil? <span class="req">*</span></span>
+        <div class="nps" role="group" aria-labelledby="nps-l" id="nps"></div>
+        <div class="nps-bands" aria-hidden="true"><i style="background:var(--det)"></i><i style="background:var(--neu)"></i><i style="background:var(--pro)"></i></div>
+        <div class="nps-ends"><span>0 = nada provável</span><span>10 = com certeza</span></div>
+        <div class="err" id="err-nps"></div>
+      </div>
+      <div class="q">
+        <label class="q-label" for="nps_motivo">Qual o principal motivo da sua nota?</label>
+        <textarea id="nps_motivo" name="nps_motivo" placeholder="Conte o que pesou na sua avaliação"></textarea>
+      </div>
+    </section>
+
+    <!-- departments injected here -->
+    <div id="depts"></div>
+
+    <!-- Reclamações -->
+    <section class="step" data-step="reclam">
+      <h2>Reclamações e sugestões</h2>
+      <p class="lead">Aqui vale tudo o que você gostaria de nos dizer.</p>
+      <div class="q">
+        <span class="q-label">Você tem alguma reclamação sobre os serviços prestados?</span>
+        <div class="choices inline">
+          <label class="choice"><input type="radio" name="tem_reclamacao" value="Sim"> Sim</label>
+          <label class="choice"><input type="radio" name="tem_reclamacao" value="Não"> Não</label>
+        </div>
+      </div>
+      <div class="q" id="reclam-box" hidden>
+        <label class="q-label" for="reclamacao">Descreva sua reclamação <span class="q-hint">e, se possível, o setor envolvido</span></label>
+        <textarea id="reclamacao" name="reclamacao"></textarea>
+      </div>
+      <div class="q">
+        <label class="q-label" for="sugestoes">Que sugestões de melhoria você daria para a LAM?</label>
+        <textarea id="sugestoes" name="sugestoes"></textarea>
+      </div>
+      <div class="q">
+        <label class="q-label" for="novos_servicos">Existe algum serviço que você gostaria que a LAM oferecesse?</label>
+        <textarea id="novos_servicos" name="novos_servicos" placeholder="Ex.: planejamento tributário, BPO financeiro, consultoria de gestão"></textarea>
+      </div>
+    </section>
+
+    <!-- Geral -->
+    <section class="step" data-step="geral">
+      <h2>Para finalizar</h2>
+      <div class="q">
+        <span class="q-label">De forma geral, qual o seu nível de satisfação com a LAM? <span class="req">*</span></span>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="satisfacao_geral" value="Muito satisfeito"> Muito satisfeito</label>
+          <label class="choice"><input type="radio" name="satisfacao_geral" value="Satisfeito"> Satisfeito</label>
+          <label class="choice"><input type="radio" name="satisfacao_geral" value="Neutro"> Neutro</label>
+          <label class="choice"><input type="radio" name="satisfacao_geral" value="Insatisfeito"> Insatisfeito</label>
+          <label class="choice"><input type="radio" name="satisfacao_geral" value="Muito insatisfeito"> Muito insatisfeito</label>
+        </div>
+        <div class="err" id="err-geral"></div>
+      </div>
+      <div class="q">
+        <label class="q-label" for="empresa">Nome da empresa <span class="req">*</span></label>
+        <input type="text" id="empresa" name="empresa" autocomplete="organization" required aria-required="true">
+        <div class="err" id="err-empresa"></div>
+      </div>
+      <div class="q">
+        <label class="q-label" for="nome">Nome do responsável pelo preenchimento <span class="q-hint">(opcional)</span></label>
+        <input type="text" id="nome" name="nome" autocomplete="name">
+      </div>
+      <div class="q">
+        <span class="q-label">Podemos entrar em contato para conversar sobre suas respostas?</span>
+        <div class="choices inline">
+          <label class="choice"><input type="radio" name="autoriza_contato" value="Sim"> Sim</label>
+          <label class="choice"><input type="radio" name="autoriza_contato" value="Não"> Não</label>
+        </div>
+      </div>
+      <div class="q" id="contato-box" hidden>
+        <label class="q-label" for="contato">Telefone ou e-mail para contato</label>
+        <input type="text" id="contato" name="contato" autocomplete="tel">
+      </div>
+      <div class="err" id="err-send" role="alert"></div>
+    </section>
+
+    <!-- Obrigado -->
+    <section class="step" data-step="fim">
+      <div class="thanks-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+      <h1>Muito obrigado!</h1>
+      <p class="lead">Suas respostas foram enviadas para a equipe da LAM. Sua opinião nos ajuda a crescer junto com a sua empresa.</p><p class="lead" style="margin-bottom:0">Resumo do que você respondeu:</p>
+      <div class="summary" id="summary" tabindex="0"></div>
+      <button class="btn btn-ghost" id="copy" type="button">Copiar respostas</button><span class="copied" id="copied" aria-live="polite"></span>
+      <p class="lead" style="margin:18px 0 0">Equipe LAM Consultoria Contábil Empresarial</p>
+    </section>
+
+    <div class="nav" id="nav">
+      <button class="btn btn-ghost" id="back" type="button">Voltar</button>
+      <button class="btn btn-primary" id="next" type="button">Começar</button>
+    </div>
+  </main>
+  <p class="foot">LAM Consultoria Contábil Empresarial · Pesquisa de satisfação</p>
+</div>
+
+<script>
+(function(){
+  var DEPTS = [
+    {id:"relacionamento", nome:"Relacionamento com o Cliente", desc:"Atendimento e comunicação com o escritório.",
+     itens:["Cordialidade e atenção no atendimento","Rapidez para responder dúvidas e solicitações","Facilidade de contato (telefone, WhatsApp, e-mail)"]},
+    {id:"societario", nome:"Societário", desc:"Abertura, alterações contratuais e encerramento de empresas.",
+     itens:["Agilidade nos processos de alteração contratual e registros","Clareza nas orientações sobre a documentação necessária"]},
+    {id:"financeiro", nome:"Financeiro", desc:"Cobranças, honorários e boletos.",
+     itens:["Clareza das cobranças e dos valores de honorários","Pontualidade no envio de boletos"]},
+    {id:"fiscal", nome:"Fiscal", desc:"Impostos, guias e obrigações acessórias.",
+     itens:["Envio das guias de impostos dentro do prazo","Orientação sobre enquadramento tributário e economia de impostos"]},
+    {id:"contabil", nome:"Contábil", desc:"Balanços, balancetes e relatórios.",
+     itens:["Qualidade e confiabilidade das informações contábeis","Clareza dos relatórios para apoiar suas decisões"]},
+    {id:"dp", nome:"Departamento Pessoal", desc:"Folha de pagamento, admissões, férias e rescisões.",
+     itens:["Precisão no cálculo da folha de pagamento e encargos ou pró-labore","Agilidade em admissões, férias e rescisões"]},
+    {id:"bpo_financeiro", nome:"BPO Financeiro", desc:"Gestão terceirizada das rotinas financeiras da sua empresa.",
+     itens:["Organização e pontualidade nas contas a pagar e a receber","Precisão da conciliação bancária e dos relatórios financeiros"]},
+    {id:"bpo_dp", nome:"BPO Departamento Pessoal", desc:"Gestão terceirizada das rotinas de pessoal da sua empresa.",
+     itens:["Organização das rotinas de pessoal (ponto, benefícios e documentos)","Agilidade no atendimento às demandas dos colaboradores"]}
+  ];
+  var ans = {nps:null, depts:{}};
+
+  // Build NPS scale
+  var npsEl = document.getElementById("nps");
+  for (var n=0;n<=10;n++){
+    var b=document.createElement("button");
+    b.type="button"; b.textContent=n; b.setAttribute("aria-pressed","false");
+    b.setAttribute("aria-label","Nota "+n);
+    b.className = n<=6?"det":(n<=8?"neu":"pro");
+    b.dataset.v=n;
+    b.addEventListener("click",function(){
+      ans.nps=+this.dataset.v;
+      npsEl.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed", x===this?"true":"false")},this);
+      document.getElementById("err-nps").textContent="";
+    });
+    npsEl.appendChild(b);
+  }
+
+  // Build department steps
+  var host=document.getElementById("depts");
+  var labels=["Muito insatisfeito","Insatisfeito","Regular","Satisfeito","Muito satisfeito"];
+  DEPTS.forEach(function(d,di){
+    ans.depts[d.id]={naoUtiliza:false,notas:{},melhoria:""};
+    var s=document.createElement("section");
+    s.className="step"; s.dataset.step="dept";
+    var html='<span class="dept-tag">Setor '+(di+1)+' de '+DEPTS.length+'</span>'+
+      '<h2>'+d.nome+'</h2><p class="lead">'+d.desc+'</p>'+
+      '<label class="skip"><input type="checkbox" data-skip="'+d.id+'"> Não utilizo este setor</label>'+
+      '<div class="dept-body" id="body-'+d.id+'">';
+    d.itens.forEach(function(it,ii){
+      var lid="l-"+d.id+"-"+ii;
+      html+='<div class="q"><span class="q-label" id="'+lid+'">'+it+'</span><div class="rate" role="group" aria-labelledby="'+lid+'">';
+      for(var r=1;r<=5;r++) html+='<button type="button" aria-pressed="false" aria-label="'+r+' – '+labels[r-1]+'" data-d="'+d.id+'" data-i="'+ii+'" data-v="'+r+'">'+r+'</button>';
+      html+='</div><div class="rate-legend">1 = muito insatisfeito · 5 = muito satisfeito</div></div>';
+    });
+    html+='<div class="q"><label class="q-label" for="m-'+d.id+'">O que poderia melhorar neste setor?</label><textarea id="m-'+d.id+'" data-m="'+d.id+'"></textarea></div></div>';
+    s.innerHTML=html; host.appendChild(s);
+  });
+  host.addEventListener("click",function(e){
+    var b=e.target.closest(".rate button"); if(!b) return;
+    ans.depts[b.dataset.d].notas[b.dataset.i]=+b.dataset.v;
+    b.parentNode.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false")});
+  });
+  host.addEventListener("change",function(e){
+    var id=e.target.dataset.skip; if(!id) return;
+    ans.depts[id].naoUtiliza=e.target.checked;
+    document.getElementById("body-"+id).hidden=e.target.checked;
+  });
+  host.addEventListener("input",function(e){ var id=e.target.dataset.m; if(id) ans.depts[id].melhoria=e.target.value; });
+
+  function radio(name){var r=document.querySelector('input[name="'+name+'"]:checked');return r?r.value:"";}
+  document.querySelectorAll('input[name="tem_reclamacao"]').forEach(function(r){r.addEventListener("change",function(){document.getElementById("reclam-box").hidden=radio("tem_reclamacao")!=="Sim";});});
+  document.querySelectorAll('input[name="autoriza_contato"]').forEach(function(r){r.addEventListener("change",function(){document.getElementById("contato-box").hidden=radio("autoriza_contato")!=="Sim";});});
+  document.getElementById("empresa").addEventListener("input",function(){document.getElementById("err-empresa").textContent="";});
+  document.querySelectorAll('input[name="satisfacao_geral"]').forEach(function(r){r.addEventListener("change",function(){document.getElementById("err-geral").textContent="";});});
+
+  // Stepper
+  var steps=[].slice.call(document.querySelectorAll(".step"));
+  var total=steps.length-2; // excluding intro and fim
+  var cur=0;
+  var next=document.getElementById("next"), back=document.getElementById("back");
+  function show(i){
+    steps.forEach(function(s,k){s.classList.toggle("on",k===i)});
+    cur=i;
+    var isIntro=i===0, isEnd=i===steps.length-1, isLast=i===steps.length-2;
+    back.hidden=isIntro||isEnd;
+    next.hidden=isEnd;
+    next.textContent=isIntro?"Começar":(isLast?"Enviar respostas":"Continuar");
+    document.getElementById("stepcount").textContent=(isIntro||isEnd)?"":("Etapa "+i+" de "+total);
+    document.getElementById("bar").style.width=(isEnd?100:(i/(total+1))*100)+"%";
+    if(isEnd) buildSummary();
+    window.scrollTo({top:0,behavior:"auto"});
+    var h=steps[i].querySelector("h1,h2"); if(h && i>0){h.setAttribute("tabindex","-1");h.focus({preventScroll:true});}
+  }
+  function valid(){
+    var st=steps[cur].dataset.step;
+    if(st==="nps" && ans.nps===null){document.getElementById("err-nps").textContent="Escolha uma nota de 0 a 10 para continuar.";return false;}
+    if(st==="geral"){
+      var ok=true;
+      if(!radio("satisfacao_geral")){document.getElementById("err-geral").textContent="Escolha uma opção para enviar a pesquisa.";ok=false;}
+      if(!v("empresa")){document.getElementById("err-empresa").textContent="Informe o nome da empresa para enviar a pesquisa.";if(ok)document.getElementById("empresa").focus();ok=false;}
+      return ok;
+    }
+    return true;
+  }
+  var FORM_NAME="pesquisa-lam";
+  var sending=false;
+  next.addEventListener("click",function(){
+    if(!valid()||sending) return;
+    if(cur===steps.length-2){ enviar(); return; }
+    show(Math.min(cur+1,steps.length-1));
+  });
+  function payload(){
+    buildSummary();
+    var cat=ans.nps>=9?"Promotor":(ans.nps>=7?"Neutro":"Detrator");
+    var p={
+      "subject":"Pesquisa NPS LAM - nota "+ans.nps+" ("+cat+") - "+v("empresa"),
+      "Empresa":v("empresa"),
+      "Responsável pelo preenchimento":v("nome")||"Não informado",
+      "Nota de indicação (0 a 10)":String(ans.nps), "Classificação NPS":cat,
+      "Motivo da nota":v("nps_motivo")||"-"
+    };
+    DEPTS.forEach(function(d){
+      var a=ans.depts[d.id];
+      p[d.nome+" - Utiliza o setor"]=a.naoUtiliza?"Não":"Sim";
+      d.itens.forEach(function(it,ii){ p[d.nome+" - "+it]=a.naoUtiliza?"Não utiliza":String(a.notas[ii]||"-"); });
+      p[d.nome+" - Melhorias"]=a.naoUtiliza?"Não utiliza":(a.melhoria.trim()||"-");
+    });
+    p["Tem reclamação"]=radio("tem_reclamacao")||"-";
+    p["Reclamação"]=(radio("tem_reclamacao")==="Sim"&&v("reclamacao"))||"-";
+    p["Sugestões de melhoria"]=v("sugestoes")||"-";
+    p["Novos serviços desejados"]=v("novos_servicos")||"-";
+    p["Satisfação geral"]=radio("satisfacao_geral");
+    p["Autoriza contato"]=radio("autoriza_contato")||"-";
+    p["Contato"]=(radio("autoriza_contato")==="Sim"&&v("contato"))||"-";
+    p["Resumo completo"]=document.getElementById("summary").textContent;
+    return p;
+  }
+  function enviar(){
+    var err=document.getElementById("err-send");
+    sending=true; err.textContent=""; next.disabled=true; back.disabled=true; next.textContent="Enviando…";
+    var body=new URLSearchParams(); body.append("form-name",FORM_NAME); body.append("bot-field","");
+    var data=payload(); Object.keys(data).forEach(function(k){ body.append(k,data[k]); });
+    fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:body.toString()})
+      .then(function(r){ if(!r.ok) throw new Error("status "+r.status); show(steps.length-1); })
+      .catch(function(){
+        err.textContent="Não foi possível enviar agora. Verifique sua conexão e tente novamente. Se o problema continuar, envie suas respostas para contato@lamconsultoria.net.br.";
+        next.textContent="Tentar enviar de novo";
+      })
+      .then(function(){ sending=false; next.disabled=false; back.disabled=false; });
+  }
+  back.addEventListener("click",function(){ show(Math.max(cur-1,0)); });
+
+  function v(id){return (document.getElementById(id).value||"").trim();}
+  function buildSummary(){
+    var cat=ans.nps>=9?"Promotor":(ans.nps>=7?"Neutro":"Detrator");
+    var t="PESQUISA DE SATISFAÇÃO – LAM\n\n";
+    t+="Indicaria a LAM (0–10): "+ans.nps+" ("+cat+")\n";
+    if(v("nps_motivo")) t+="Motivo: "+v("nps_motivo")+"\n";
+    DEPTS.forEach(function(d){
+      var a=ans.depts[d.id];
+      t+="\n"+d.nome+":\n";
+      if(a.naoUtiliza){t+="  Não utiliza\n";return;}
+      d.itens.forEach(function(it,ii){t+="  "+it+": "+(a.notas[ii]||"–")+"\n";});
+      if(a.melhoria.trim()) t+="  Melhorias: "+a.melhoria.trim()+"\n";
+    });
+    t+="\nReclamação: "+(radio("tem_reclamacao")||"–")+"\n";
+    if(radio("tem_reclamacao")==="Sim"&&v("reclamacao")) t+="  "+v("reclamacao")+"\n";
+    if(v("sugestoes")) t+="Sugestões: "+v("sugestoes")+"\n";
+    if(v("novos_servicos")) t+="Novos serviços: "+v("novos_servicos")+"\n";
+    t+="\nSatisfação geral: "+radio("satisfacao_geral")+"\n";
+    t+="Empresa: "+v("empresa")+"\n";
+    if(v("nome")) t+="Responsável: "+v("nome")+"\n";
+    t+="Autoriza contato: "+(radio("autoriza_contato")||"–")+(radio("autoriza_contato")==="Sim"&&v("contato")?" ("+v("contato")+")":"")+"\n";
+    document.getElementById("summary").textContent=t;
+  }
+  document.getElementById("copy").addEventListener("click",function(){
+    var txt=document.getElementById("summary").textContent, msg=document.getElementById("copied");
+    function fallback(){
+      var r=document.createRange(); r.selectNodeContents(document.getElementById("summary"));
+      var s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      try{ document.execCommand("copy"); msg.textContent="Copiado"; }catch(e){ msg.textContent="Texto selecionado: use Ctrl+C para copiar"; }
+    }
+    try{ navigator.clipboard.writeText(txt).then(function(){msg.textContent="Copiado";},fallback); }catch(e){ fallback(); }
+  });
+
+  show(0);
+})();
+</script>
+</body>
+</html>
